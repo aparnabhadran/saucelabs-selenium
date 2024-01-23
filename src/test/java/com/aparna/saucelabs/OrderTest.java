@@ -11,10 +11,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class ProductTest {
+public class OrderTest {
 	private WebDriver driver;
 	
 	@BeforeEach
@@ -30,20 +29,13 @@ public class ProductTest {
 		usernameField.sendKeys("standard_user");
 		passwordField.sendKeys("secret_sauce");
 		loginButton.click();
-	}
-	
-	@Test
-	public void productsDisplayed() {
+		
 		
 		WebElement productEl = driver.findElement(By.id("item_4_title_link"));
 		
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.visibilityOf(productEl));
 		Assertions.assertEquals("Sauce Labs Backpack", productEl.getText());
-	}
-		
-	@Test
-	public void addToCart() {
 		
 		WebElement addToCartEl = driver.findElement(By.xpath("//*[@id=\"inventory_container\"]/div/div[1]/div[3]/button"));
 	    addToCartEl.click();
@@ -55,36 +47,49 @@ public class ProductTest {
 	    cartNumber.click();
 	    WebElement displayEl = driver.findElement(By.id("item_4_title_link"));
 	    
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-	    wait.until(ExpectedConditions.visibilityOf(displayEl));
+	    WebDriverWait wait1 = new WebDriverWait(driver, Duration.ofSeconds(10));
+	    wait1.until(ExpectedConditions.visibilityOf(displayEl));
 	    Assertions.assertEquals("Sauce Labs Backpack", displayEl.getText());
 	    
 	    WebElement priceEl = driver.findElement(By.className("inventory_item_price"));
 	    Assertions.assertEquals("29.99", priceEl.getText());
-	    
 	}
-	
-	@Test
-	public void sortProducts() {
-		WebElement testDropDown = driver.findElement(By.className("product_sort_container"));
-		Select dropDown = new Select(testDropDown);
-		dropDown.selectByValue("lohi");
+	 
+	 @Test
+	 public void orderProduct() {
+		WebElement checkoutButton = driver.findElement(By.className("checkout_button"));
+		checkoutButton.click();
 		
-		WebElement firstAssignedEl = driver.findElement(By.xpath("//div[@id=\"inventory_container\"]/div/div[1]/div[2]/a/div"));
+		WebElement checkoutPageEl = driver.findElement(By.className("subheader"));
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-		wait.until(ExpectedConditions.visibilityOf(firstAssignedEl));
-		Assertions.assertEquals("Sauce Labs Onesie", firstAssignedEl.getText());
-			
+		wait.until(ExpectedConditions.visibilityOf(checkoutPageEl));
+		Assertions.assertEquals("Checkout: Your Information", checkoutPageEl.getText());
+		
+		WebElement firstNameEl = driver.findElement(By.id("first-name"));
+		WebElement lastNameEl = driver.findElement(By.id("last-name"));
+		WebElement zipCodeEl = driver.findElement(By.id("postal-code"));
+		WebElement continueEl = driver.findElement(By.className("cart_button"));
+		firstNameEl.sendKeys("Aparna");
+		lastNameEl.sendKeys("Bhadran");
+		zipCodeEl.sendKeys("695525");
+		continueEl.click(); 
+		
+		WebElement overviewEl = driver.findElement(By.className("subheader"));
+		WebDriverWait wait1 = new WebDriverWait(driver, Duration.ofSeconds(10));
+		wait1.until(ExpectedConditions.visibilityOf(overviewEl));
+		Assertions.assertEquals("Checkout: Overview", overviewEl.getText());
+		
+		WebElement finishEl = driver.findElement(By.className("cart_button"));
+		finishEl.click();
+		
+		WebElement orderMessageEl = driver.findElement(By.className("complete-header"));
+		WebDriverWait wait2 = new WebDriverWait(driver, Duration.ofSeconds(10));
+		wait2.until(ExpectedConditions.visibilityOf(orderMessageEl));
+		Assertions.assertEquals("THANK YOU FOR YOUR ORDER", orderMessageEl.getText());
 	}
-	
-	
-	@AfterEach
-	public void tearDown() {
-		driver.quit();
-	}
-	
-	
-	
-	
-
+	 
+	 @AfterEach
+	 public void TearDown(){
+		 driver.quit();
+	 }
 }
